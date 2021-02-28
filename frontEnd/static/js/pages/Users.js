@@ -1,37 +1,39 @@
-import AbstractPage from "./AbstractPage.js";
+import SearchItemsPage from "./SearchItemsPage.js";
 
-export default class extends AbstractPage {
+export default class Users extends SearchItemsPage {
     constructor(params) {
-        super(params);
-        this.setTitle("Users");
-        this.state = {
-            loading: false,
-            userRecords: [],
-            searchText:'',
-        };
-        this.init();
+        super({title: 'Users', apiPath: '/users', inColumn: 'user', ...params});
+        this.init()
     }
 
     init() {
-        let input= document.createElement('input');
-        input.setAttribute('placeholder', "Search for users");
-        input.setAttribute('id', "search-input");
-        input.addEventListener('keyup',({key})=>{
-            if(key === 'Enter' && input.value !== this.state.searchText) {
-                this.state.searchText = input.value;
-                this.getUserRecords()
-            }
-        });
-        this.wrapper.appendChild(input);
+        this.recordsList = document.createElement('div');
+        this.recordsList.classList.add("records-list");
+        this.contentWrapper.appendChild(this.recordsList)
     }
 
-    getUserRecords(){
-        if(this.state.searchText ===  '') return false;
-
-
+    drawRecords(items) {
+        this.recordsList.innerHTML = '';
+        for (const item of items) {
+            this.recordsList.appendChild(Users.createRecordItem(item))
+        }
     }
 
-    async getHtml() {
-        return this.wrapper;
+    static createRecordItem(item) {
+        const itemName = document.createElement('span');
+        itemName.innerHTML = item.login;
+        const itemImage = document.createElement('img');
+        itemImage.setAttribute('src', item.avatar_url);
+        itemImage.setAttribute('alt', 'Avatar');
+
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add("user-card");
+        itemDiv.appendChild(itemImage);
+        itemDiv.appendChild(itemName);
+
+        const link = document.createElement('a');
+        link.setAttribute('href', `/users/${item.login}`);
+        link.appendChild(itemDiv);
+        return link;
     }
 }

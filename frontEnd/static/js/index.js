@@ -1,12 +1,12 @@
 import Users from "./pages/Users.js";
-import PostView from "./pages/Repositories.js";
+import Repositories from "./pages/Repositories.js";
+import UserProfile from "./pages/UserProfile.js";
 
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
 const getParams = match => {
     const values = match.result.slice(1);
     const keys = Array.from(match.route.path.matchAll(/:(\w+)/g)).map(result => result[1]);
-    console.log(keys)
     return Object.fromEntries(keys.map((key, i) => {
         return [key, values[i]];
     }));
@@ -19,9 +19,9 @@ const navigateTo = url => {
 
 const router = async () => {
     const routes = [
-        { path: "/users", view: Users },
-        { path: "/users/:id", view: PostView },
-        { path: "/repositories", view: PostView }
+        { path: "/users", basePath:'users', view: Users },
+        { path: "/users/:id", basePath:'users', view: UserProfile },
+        { path: "/repositories", basePath:'repositories',view: Repositories }
     ];
 
     // Test each route for potential match
@@ -45,7 +45,7 @@ const router = async () => {
 
     /**Setting active link*/
     for (const aTag of document.getElementById('nav').getElementsByTagName('a')){
-        aTag.id === `${match.route.path}-link` ? aTag.classList.add("active") : aTag.classList.remove("active")
+        aTag.id === `${match.route.basePath}-link` ? aTag.classList.add("active") : aTag.classList.remove("active")
     }
 
     /**Remove all children before setting content*/
