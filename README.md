@@ -1,6 +1,6 @@
 # github-users-SPA
 
-##Description
+## Description
 
 This is simple Single Page Application to search and view Github Users and Repositories
 
