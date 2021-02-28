@@ -14,8 +14,8 @@ export default class Pagination {
         this.btnWrapper.style.display = 'none';
     }
 
-    setLinks(header) {
-        const links = Pagination.parseHeaderLinks(header);
+    setLinks(link) {
+        const links = Pagination.parseHeaderLinks(link);
         if (links.next || links.prev) {
             if (links.prev) {
                 this.btnPrev.onclick = () => this.getRecords(links.prev);

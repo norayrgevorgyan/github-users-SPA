@@ -1,6 +1,7 @@
 import BasicPage from "./BasicPage.js";
-import RepositoriesTable from "../components/RepositoriesTable.js";
 import Pagination from "../components/Pagination.js";
+import UsersService from "../services/UsersService.js";
+import drawTable from "../components/RepositoriesTable.js";
 
 export default class UserProfile extends BasicPage {
     constructor(params) {
@@ -38,11 +39,14 @@ export default class UserProfile extends BasicPage {
     }
 
     getUser(id) {
-        fetch(`https://api.github.com/users/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                this.getRepos(data.login);
-                this.drawUser(data)
+        UsersService.getUserById({id})
+            .then(({status, json: user}) => {
+                if (status === 200) {
+                    this.getRepos(user.login);
+                    this.drawUser(user)
+                } else {
+                    this.contentWrapper.innerHTML = 'User not found';
+                }
             })
     }
 
@@ -89,14 +93,15 @@ export default class UserProfile extends BasicPage {
     }
 
     getRepos(login, api) {
-        fetch(api ? api : `https://api.github.com/users/${login}/repos?&per_page=${this.per_page}`)
-            .then(res => {
-                this.pagination.setLinks(res.headers.get('link') || []);
-                return res.json()
-            })
-            .then(data => {
+        UsersService.getUserRepos({login, per_page: this.per_page, api}).then(res => {
+            if (res.status === 200) {
+                this.pagination.setLinks(res.link || []);
                 this.repoTableContent.innerHTML = '';
-                this.repoTableContent.appendChild(RepositoriesTable.drawTable(data))
-            })
+                const table = drawTable(res.json);
+                table ? this.repoTableContent.appendChild(table) : this.repoTableContent.innerHTML = 'No records found :(';
+            } else {
+                this.repoTableContent.innerHTML = res.json.message || 'Some Error occurred';
+            }
+        });
     }
 }

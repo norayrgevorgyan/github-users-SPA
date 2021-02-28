@@ -1,4 +1,5 @@
 import SearchItemsPage from "./SearchItemsPage.js";
+import UsersService from "../services/UsersService.js";
 
 export default class Users extends SearchItemsPage {
     constructor(params) {
@@ -12,10 +13,27 @@ export default class Users extends SearchItemsPage {
         this.contentWrapper.appendChild(this.recordsList)
     }
 
+    getRecords(api) {
+        if (this.state.searchText === '') return false;
+        UsersService.getUsersByName({per_page: this.per_page, name: this.state.searchText, api})
+            .then(res => {
+                if (res.status === 200) {
+                    this.pagination.setLinks(res.link || []);
+                    this.drawRecords(res.json.items || [])
+                }else{
+                    this.recordsList.innerHTML = res.json.message || 'Some Error occurred';
+                }
+            });
+    }
+
     drawRecords(items) {
         this.recordsList.innerHTML = '';
-        for (const item of items) {
-            this.recordsList.appendChild(Users.createRecordItem(item))
+        if (items.length > 0) {
+            for (const item of items) {
+                this.recordsList.appendChild(Users.createRecordItem(item))
+            }
+        } else {
+            this.recordsList.innerHTML = 'No records found :(';
         }
     }
 
