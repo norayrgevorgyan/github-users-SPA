@@ -1,5 +1,5 @@
-import Users from "./views/Users.js";
-import PostView from "./views/PostView.js";
+import Users from "./pages/Users.js";
+import PostView from "./pages/Repositories.js";
 
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
